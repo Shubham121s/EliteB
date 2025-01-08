@@ -2,7 +2,7 @@ const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const { generateOtp } = require('../utils/generateOtp');
 const { sendEmail } = require('../utils/sendEmail');
-const { sendSms } = require('../utils/sendSms');
+// const { sendSms } = require('../utils/sendSms');
 const bcrypt = require('bcrypt');
 const ErrorHandler = require('../utils/errorHandler');
 
@@ -57,39 +57,39 @@ exports.loginWithEmailPassword = async (req, res) => {
 };
 
 // Login via Mobile OTP
-exports.loginWithMobileOtp = async (req, res) => {
-  const { mobile } = req.body;
-  try {
-    const user = await User.findOne({ mobile });
-    if (!user) return res.status(404).json({ message: 'User not found' });
+// exports.loginWithMobileOtp = async (req, res) => {
+//   const { mobile } = req.body;
+//   try {
+//     const user = await User.findOne({ mobile });
+//     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    const mobileOtp = generateOtp();
-    user.mobileOtp = mobileOtp;
-    await user.save();
+//     const mobileOtp = generateOtp();
+//     user.mobileOtp = mobileOtp;
+//     await user.save();
 
-    await sendSms(mobile, `Your OTP is: ${mobileOtp}`);
-    res.status(200).json({ message: 'OTP sent to mobile' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+//     await sendSms(mobile, `Your OTP is: ${mobileOtp}`);
+//     res.status(200).json({ message: 'OTP sent to mobile' });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
-// Verify Mobile OTP
-exports.verifyMobileOtpLogin = async (req, res) => {
-  const { mobile, otp } = req.body;
-  try {
-    const user = await User.findOne({ mobile });
-    if (!user || user.mobileOtp !== otp) return res.status(400).json({ message: 'Invalid OTP' });
+// // Verify Mobile OTP
+// exports.verifyMobileOtpLogin = async (req, res) => {
+//   const { mobile, otp } = req.body;
+//   try {
+//     const user = await User.findOne({ mobile });
+//     if (!user || user.mobileOtp !== otp) return res.status(400).json({ message: 'Invalid OTP' });
 
-    user.mobileOtp = null;
-    await user.save();
+//     user.mobileOtp = null;
+//     await user.save();
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    res.status(200).json({ token });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+//     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+//     res.status(200).json({ token });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
 // Login via Email OTP
 exports.loginWithEmailOtp = async (req, res) => {
